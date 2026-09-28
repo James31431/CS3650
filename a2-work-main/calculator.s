@@ -30,7 +30,7 @@ main:
   movq a, %r9  # TODO: and the LHS
   movq b, %r10
 
-  # TODO: Analyze operation and execute
+  # Analyze operation
   cmpb $'+', %r8b
   je add_case
 
@@ -43,8 +43,10 @@ main:
   cmpb $'/', %r8b
   je div_case
 
+  # Case of unknown operation
   jmp unknown_op
 
+  # For each case, execute
   add_case:
   movq %r9, %r11
   addq %r10, %r11
@@ -61,10 +63,13 @@ main:
   jmp print_result
 
   div_case:
+  # Check for zero error
   cmpq $0, %r10
   je div_error
 
+  
   movq %r9, %rax
+  # Convert Quadword to Octoword for signed division
   cqto
   idivq %r10
 
@@ -72,24 +77,28 @@ main:
   jmp print_result
 
 
-  # TODO: Print result
+  # Print result
   print_result:
   movq $output_fmt, %rdi
   movq %r11, %rsi
+
+  # Set %al to 0
   xorb %al, %al
   call printf
 
+  # Return 0
   movq $0, %rax
   leave
   ret
 
 
-  # TODO: Print error if operation cannot be (safely) performed
+  # Print error if operation cannot be (safely) performed
   unknown_op:
   movq $unknown_msg, %rdi
   xorb %al, %al
   call printf
 
+  # Print 1
   movq $1, %rax
   leave
   ret
